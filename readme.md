@@ -41,7 +41,7 @@ Supported URL Query Parameters:
 
 **Eloquenturl::eloquenturled()**
 
-This the simplest way let your app query your Eloquent models using the URL parameters. It returns the paginated entries of the model based on the URL parameters. Just pass the model and the request:
+This the simplest way let your app query your Eloquent models using the URL parameters. It returns the paginated entries of the model based on the URL parameters and your Eloquent models' `$fillable` and `$hidden` attributes. Just pass the model and the request:
 
 ```php
 $users = Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(User::class, request());
