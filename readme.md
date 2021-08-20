@@ -17,6 +17,73 @@ $ composer require doncadavona/eloquenturl
 
 ## Usage
 
+Here are example URLs with query parameters that we can parse into database queries:
+
+```
+http://app.test/users?search=apple
+
+http://app.test/users?order_by=created_at&order=desc
+
+http://app.test/users?scopes[role]=admin&scopes[status]=active&company_id=3
+
+http://app.test/users?search=apple&search_by=first_name&order_by=created_at&order=desc&scopes[role]=admin&scopes[status]=active&company_id=3
+```
+
+Supported URL Query Parameters:
+
+  - page
+  - per_page
+  - search
+  - search_by
+  - order
+  - order_by
+  - scopes
+
+**Eloquenturl::eloquenturled()**
+
+This the simplest way let your app query your Eloquent models using the URL parameters. It returns the paginated entries of the model based on the URL parameters. Just pass the model and the request:
+
+```php
+$users = Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(User::class, request());
+```
+
+**Eloquenturl::eloquenturl()**
+
+Use `Eloquenturl::eloquenturl()` when you need to add additional queries, such as eager-loading, or any other database queries available in Laravel's Query Builder.
+
+```php
+<?php
+
+use App\Models\User;
+use App\Models\Article;
+use App\Http\Controllers\Controller;
+use Doncadavona\Eloquenturl\Eloquenturl;
+use Illuminate\Http\Request;
+
+class UsersController extends Controller
+{
+	public function index(Request $request)
+    {
+    	// It's this easy.
+    	$users = Eloquenturl::eloquenturled(User::class, $request);
+
+    	// Or, add your own sauce.
+        $users = Eloquenturl::eloquenturl(User::class, $request)
+            ->with(['roles', 'articles', 'comments'])
+            ->paginate();
+
+        return $users;
+
+        // Or, use any other Eloquent model.
+        $articles = Eloquenturl::eloquenturl(Article::class, $request)
+            ->with(['user', 'comments'])
+            ->get();
+
+        return $articles;
+    }
+}
+```
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
