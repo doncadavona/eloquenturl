@@ -1,3 +1,4 @@
+
 # Eloquenturl
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
@@ -17,9 +18,9 @@ $ composer require doncadavona/eloquenturl
 
 ## Usage
 
-Here are example URLs with query parameters that we can parse into database queries:
+Here are example URLs with query parameters:
 
-```
+```http
 http://app.test/users?search=apple
 
 http://app.test/users?order_by=created_at&order=desc
@@ -29,7 +30,9 @@ http://app.test/users?scopes[role]=admin&scopes[status]=active&company_id=3
 http://app.test/users?search=apple&search_by=first_name&order_by=created_at&order=desc&scopes[role]=admin&scopes[status]=active&company_id=3
 ```
 
-Supported URL Query Parameters:
+**URL Query Parameters:**
+
+Currently, these are the supported parameters:
 
   - page
   - per_page
@@ -38,6 +41,31 @@ Supported URL Query Parameters:
   - order
   - order_by
   - scopes
+
+If unknown parameters are in the request, they will be queried with *WHERE Clause* using equality condition. For example:
+
+```http
+/users?active=true
+/users?status=suspended
+/users?country=PH
+/users?planet_number=3
+/users?company_id=99
+```
+
+The equivalent database queries will be:
+
+```sql
+SELECT * FROM `users` WHERE `active` = true;
+SELECT * FROM `users` WHERE `status` = 'suspended';
+SELECT * FROM `users` WHERE `country` = 'PH';
+SELECT * FROM `users` WHERE `planet_number` = 3;
+SELECT * FROM `users` WHERE `company_id` = 99;
+```
+
+**Planned URL Query Parameters:**
+
+  - date_range
+  - ...
 
 **Eloquenturl::eloquenturled()**
 
@@ -64,10 +92,10 @@ class UsersController extends Controller
 {
     public function index(Request $request)
     {
-    	// It's this easy.
-    	$users = Eloquenturl::eloquenturled(User::class, $request);
+        // It's this easy.
+        $users = Eloquenturl::eloquenturled(User::class, $request);
 
-    	// Or, add your own sauce.
+        // Or, add your own sauce.
         $users = Eloquenturl::eloquenturl(User::class, $request)
             ->with(['roles', 'articles', 'comments'])
             ->paginate();
