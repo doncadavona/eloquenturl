@@ -200,7 +200,12 @@ class Eloquenturl implements EloquenturlInterface
 
         foreach (self::$column_matches as $key => $value) {
             if (self::$request->filled($key)) {
-                self::$query = self::$query->where($key, $value);
+                if (is_numeric($key)) {
+                    self::$query = self::$query->where($key, (int) $value);
+                    return;
+                } else {
+                    self::$query = self::$query->where($key, $value);
+                }
             }
         }
     }
