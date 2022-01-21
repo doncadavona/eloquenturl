@@ -54,7 +54,7 @@ class Eloquenturl implements EloquenturlInterface
     ];
 
     /**
-     * The datanase columns to order by.
+     * The database columns to order by.
      * Eg. /users?order_by=name&order=desc
      * 
      * @var array
@@ -194,9 +194,7 @@ class Eloquenturl implements EloquenturlInterface
      */
     private static function buildColumnMatcher(): void
     {
-        if (!self::$column_matches) {
-            return;
-        }
+        if (!self::$column_matches) return;
 
         foreach (self::$column_matches as $key => $value) {
             if (self::$request->filled($key)) {
@@ -269,9 +267,7 @@ class Eloquenturl implements EloquenturlInterface
      */
     private static function buildScoper(): void
     {
-        if (!self::$scopes) {
-            return;
-        }
+        if (!self::$scopes) return;
 
         foreach (self::$scopes as $key => $value) {
             if (self::$request->filled('scopes.' . $key)) {
