@@ -20,15 +20,15 @@ _Eloquenturl is fast_ because it is built and executed as a single database quer
 
 ## Table of Contents
 
-- [I. Installation](#installation)
-- [II. Usage](#usage)
-- [III. Query Parameters](#query-parameters)
-- [IV. Change Log](#change-log)
-- [V. Testing](#change-log)
-- [VI. Contributing](#contributing)
-- [VII. Security](#security)
-- [VIII. Credits](#credits)
-- [IX. License](#license)
+- [I. Installation](#i-installation)
+- [II. Usage](#ii-usage)
+- [III. Query Parameters](#iii-query-parameters)
+- [IV. Change Log](#iv-change-log)
+- [V. Testing](#v-change-log)
+- [VI. Contributing](#vi-contributing)
+- [VII. Security](#vii-security)
+- [VIII. Credits](#viii-credits)
+- [IX. License](#ix-license)
 
 ## I. Installation
 
