@@ -18,6 +18,8 @@ By just passing the model and the request, the model is made searchable and filt
 
 _Eloquenturl is fast_ because it is built and executed as a single database query.
 
+Read [Eloquenturl: A Laravel Package to Simplify or Eliminate Query Building for URL Parameters](https://dev.to/doncadavona/eloquenturl-a-laravel-package-to-simplify-or-eliminate-query-building-for-url-parameters-2iem).
+
 ## Table of Contents
 
 - [I. Installation](#i-installation)
