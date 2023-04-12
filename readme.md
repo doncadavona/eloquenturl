@@ -244,7 +244,7 @@ If you discover any security related issues, please email dcadavona@gmail.com in
 
 ## VIII. Credits
 
-- [Don Cadavona][https://doncadavona.com]
+- [Don Cadavona](https://doncadavona.com)
 
 ## IX. License
 
