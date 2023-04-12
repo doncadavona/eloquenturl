@@ -41,6 +41,12 @@ class Eloquenturl implements EloquenturlInterface
         'order',
         'order_by',
         'scopes',
+        'lt',
+        'gt',
+        'lte',
+        'gte',
+        'min',
+        'max',
     ];
 
     /**
@@ -175,6 +181,24 @@ class Eloquenturl implements EloquenturlInterface
         // Build column matcher
         self::buildColumnMatcher();
 
+        // Build column less than identifer
+        self::buildColumnLessThan();
+
+        // Build column greater than identifer
+        self::buildColumnGreaterThan();
+
+        // Build column less than or equal (lte) identifer
+        self::buildColumnLessThanOrEqual();
+
+        // Build column greater than or equal (gte) identifer
+        self::buildColumnGreaterThanOrEqual();
+
+        // Build column min (alias for gte) identifer
+        self::buildColumnMin();
+
+        // Build column max (alias for lte) identifer
+        self::buildColumnMax();
+
         // Build column searcher
         self::buildColumnSearcher();
 
@@ -206,6 +230,103 @@ class Eloquenturl implements EloquenturlInterface
                 }
             }
         }
+    }
+
+    /**
+     * Build the database query where columns are less than specified values.
+     * 
+     * @return void
+     */
+    private static function buildColumnLessThan(): void
+    {
+        // Build column less than identifer
+        if (self::$request->filled('lt')) {
+            foreach (self::$request->lt as $key => $value) {
+                if ($value) {
+                    self::$query = self::$query->where($key, '<', $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Build the database query where columns are greater than specified values.
+     * 
+     * @return void
+     */
+    private static function buildColumnGreaterThan(): void 
+    {
+        // Build column greater than identifer
+        if (self::$request->filled('gt')) {
+            foreach (self::$request->gt as $key => $value) {
+                if ($value) {
+                    self::$query = self::$query->where($key, '>', $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Build the database query where columns are less than or equal specified values.
+     * 
+     * @return void
+     */
+    private static function buildColumnLessThanOrEqual(): void
+    {
+        // Build column less than or equal (lte) identifer
+        if (self::$request->filled('lte')) {
+            foreach (self::$request->lte as $key => $value) {
+                if ($value) {
+                    self::$query = self::$query->where($key, '<=', $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Build the database query where columns are greater than or equal specified values.
+     * 
+     * @return void
+     */
+    private static function buildColumnGreaterThanOrEqual(): void
+    {
+        // Build column greater than or equal (lte) identifer
+        if (self::$request->filled('gte')) {
+            foreach (self::$request->gte as $key => $value) {
+                if ($value) {
+                    self::$query = self::$query->where($key, '>=', $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Alias for buildColumnGreaterThanOrEqual (gte).
+     * Build the database query to set the minimum values of columns.
+     * 
+     * @return void
+     */
+    private static function buildColumnMin(): void
+    {
+        // Build column min (alias for gte) identifer
+        if (self::$request->filled('min')) {
+            foreach (self::$request->min as $key => $value) {
+                if ($value) {
+                    self::$query = self::$query->where($key, '>=', $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Alias for buildColumnLessThanOrEqual (lte).
+     * Build the database query to set the maximum values of columns.
+     * 
+     * @return void
+     */
+    private static function buildColumnMax(): void
+    {
+        self::buildColumnLessThanOrEqual();
     }
 
     /**

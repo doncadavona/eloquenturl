@@ -41,6 +41,12 @@ Currently, these are the supported parameters:
   - order
   - order_by
   - scopes
+  - lt _(less than)_
+  - gt _(greater than)_
+  - lte _(less than or equal)_
+  - gte _(greater than or equal)_
+  - min _(alias for gte)_
+  - max _(alias for lte)_
 
 If unknown parameters are in the request, they will be queried with *WHERE Clause* using equality condition. For example:
 
@@ -64,7 +70,13 @@ SELECT * FROM `users` WHERE `company_id` = 99;
 
 **Planned URL Query Parameters:**
 
-  - date_range
+  - ~~date_range~~ (cancelled)
+  - ~~lt (less than)~~ (now available)
+  - ~~gt (greater than)~~ (now available)
+  - ~~lte (less than or equal)~~ (now available)
+  - ~~gte (greater than or equal)~~ (now available)
+  - ~~min (alias for gte)~~ (now available)
+  - ~~max (alias for lte)~~ (now available)
   - ...
 
 **Eloquenturl::eloquenturled()**
