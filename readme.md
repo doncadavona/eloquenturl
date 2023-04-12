@@ -6,90 +6,53 @@
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-Query Laravel Eloquent models with URL query parameters. Take a look at [contributing.md](contributing.md) to see a to do list.
+Eloquenturl automatically adds search and filtering for your Eloquent model using [query string](https://en.wikipedia.org/wiki/Query_string).
 
-## Installation
+Eloquenturl respects your the `$fillable` and `$hidden` attributes of your Eloquent model to make intuitive defaults, providing zero-configuration usage. For example:
 
-Via Composer
+```php
+return \Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(\App\Models\User::class, $request)
+```
+
+By just passing the model and the request, the model is made searchable and filterable without you having to manage which attributes are queryable and without writing the complex database queries.
+
+_Eloquenturl is fast_ because it builds and executes a single database query.
+
+## Table of Contents
+
+- [I. Installation](#installation)
+- [II. Usage](#usage)
+- [III. Query Parameters](#query-parameters)
+- [IV. Change Log](#change-log)
+- [V. Testing](#change-log)
+- [VI. Contributing](#contributing)
+- [VII. Security](#security)
+- [VIII. Credits](#credits)
+- [IX. License](#license)
+
+## I. Installation
+
+Install using Composer:
 
 ``` bash
-$ composer require doncadavona/eloquenturl
+composer require doncadavona/eloquenturl
 ```
 
-## Usage
-
-Here are example URLs with query parameters:
-
-```http
-http://app.test/users?search=apple
-
-http://app.test/users?order_by=created_at&order=desc
-
-http://app.test/users?scopes[role]=admin&scopes[status]=active&company_id=3
-
-http://app.test/users?search=apple&search_by=first_name&order_by=created_at&order=desc&scopes[role]=admin&scopes[status]=active&company_id=3
-```
-
-**URL Query Parameters:**
-
-Currently, these are the supported parameters:
-
-  - page
-  - per_page
-  - search
-  - search_by
-  - order
-  - order_by
-  - scopes
-  - lt _(less than)_
-  - gt _(greater than)_
-  - lte _(less than or equal)_
-  - gte _(greater than or equal)_
-  - min _(alias for gte)_
-  - max _(alias for lte)_
-
-If unknown parameters are in the request, they will be queried with *WHERE Clause* using equality condition. For example:
-
-```http
-/users?active=true
-/users?status=suspended
-/users?country=PH
-/users?planet_number=3
-/users?company_id=99
-```
-
-The equivalent database queries will be:
-
-```sql
-SELECT * FROM `users` WHERE `active` = true;
-SELECT * FROM `users` WHERE `status` = 'suspended';
-SELECT * FROM `users` WHERE `country` = 'PH';
-SELECT * FROM `users` WHERE `planet_number` = 3;
-SELECT * FROM `users` WHERE `company_id` = 99;
-```
-
-**Planned URL Query Parameters:**
-
-  - ~~date_range~~ (cancelled)
-  - ~~lt (less than)~~ (now available)
-  - ~~gt (greater than)~~ (now available)
-  - ~~lte (less than or equal)~~ (now available)
-  - ~~gte (greater than or equal)~~ (now available)
-  - ~~min (alias for gte)~~ (now available)
-  - ~~max (alias for lte)~~ (now available)
-  - ...
+## II. Usage
 
 **Eloquenturl::eloquenturled()**
 
-This the simplest way let your app query your Eloquent models using the URL parameters. It returns the paginated entries of the model based on the URL parameters and your Eloquent models' `$fillable` and `$hidden` attributes. Just pass the model and the request:
+Use `Eloquenturl::eloquenturled()` to quickly build and execute the database query based on the request query parameters. It returns the paginated entries of the given Eloquent model, based on the URL parameters and the model's `$fillable` and `$hidden` attributes. Just pass the model and the request:
 
 ```php
-$users = Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(User::class, request());
+$users = \Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(User::class, request());
 ```
 
 **Eloquenturl::eloquenturl()**
 
-Use `Eloquenturl::eloquenturl()` when you need to add additional queries, such as eager-loading, or any other database queries available in Laravel's Query Builder.
+Use `Eloquenturl::eloquenturl()` when you need to add additional queries, such as eager-loading, or any other database queries available in [Laravel Query Builder](http://laravel.com/docs/queries).
+
+Here is an example `UsersController` with several examples.
 
 ```php
 <?php
@@ -111,6 +74,11 @@ class UsersController extends Controller
         $users = Eloquenturl::eloquenturl(User::class, $request)
             ->with(['roles', 'articles', 'comments'])
             ->paginate();
+        
+        // Or, with select query and simplePaginate
+        $users = Eloquenturl::eloquenturl(User::class, $request)
+            ->select('name', 'description')
+            ->simplePaginate($request->per_page);
 
         return $users;
 
@@ -124,30 +92,161 @@ class UsersController extends Controller
 }
 ```
 
-## Change log
+Here are example URLs with query parameters:
+
+```http
+http://localhost:8000/users?search=apple
+
+http://localhost:8000/users?order_by=created_at&order=desc
+
+http://localhost:8000/users?scopes[role]=admin&scopes[status]=active&company_id=3
+
+http://localhost:8000/users?search=apple&search_by=first_name&order_by=created_at&order=desc&scopes[role]=admin&scopes[status]=active&company_id=3
+```
+
+## III. Query Parameters
+
+  - page
+  - per_page
+  - search
+  - search_by
+  - order
+  - order_by
+  - scopes
+  - lt _(less than)_
+  - gt _(greater than)_
+  - lte _(less than or equal)_
+  - gte _(greater than or equal)_
+  - min _(alias for gte)_
+  - max _(alias for lte)_
+
+**page**
+
+```
+/users?page=5
+```
+
+**per_page**
+
+```
+/per_page?page=100
+```
+
+**search**
+
+```
+/users?search=john
+/users?search=john+doe
+/users?search=john%20doe
+```
+
+**search_by**
+
+```
+/users?search=john&search_by=first_name
+/users?search=john+doe&search_by=last_name
+/users?search=johndoe&search_by=email
+```
+
+**order**
+
+```
+/users?order=desc
+```
+
+**order_by**
+
+```
+/users?order_by=age
+```
+
+**scopes**
+
+```
+/users?scopes[status]=active
+/users?scopes[senior]
+/users?scopes[admin]
+```
+
+**lt _(less than)_**
+
+```
+/users?lt[age]=18
+```
+
+**gt _(greater than)_**
+
+```
+/users?gt[age]=17
+```
+
+**lte _(less than or equal)_**
+
+```
+/users?lte[age]=18
+```
+
+**gte _(greater than or equal)_**
+
+```
+/users?gte[age]=60
+```
+
+**min _(alias for gte)_**
+
+```
+/users?min[age]=18
+```
+
+**max _(alias for lte)_**
+
+```
+/users?max[age]=18
+```
+
+When unknown parameters are in the request, they will be queried with *WHERE Clause* using equality condition. For example:
+
+```http
+/users?active=true
+/users?status=suspended
+/users?country=PH
+/users?planet_number=3
+/users?company_id=99
+```
+
+The equivalent database queries will be:
+
+```sql
+SELECT * FROM `users` WHERE `active` = true;
+SELECT * FROM `users` WHERE `status` = 'suspended';
+SELECT * FROM `users` WHERE `country` = 'PH';
+SELECT * FROM `users` WHERE `planet_number` = 3;
+SELECT * FROM `users` WHERE `company_id` = 99;
+```
+
+## IV. Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
 
-## Testing
+## V. Testing
 
 ``` bash
 $ composer test
 ```
 
-## Contributing
+## VI. Contributing
 
 Please see [contributing.md](contributing.md) for details and a todolist.
 
-## Security
+## VII. Security
 
 If you discover any security related issues, please email dcadavona@gmail.com instead of using the issue tracker.
 
-## Credits
+## VIII. Credits
 
-- [Don Cadavona][link-author]
-- [All Contributors][link-contributors]
+- [Don Cadavona][https://doncadavona.com]
 
-## License
+## IX. License
 
 MIT. Please see the [license file](license.md) for more information.
 
