@@ -6,17 +6,17 @@
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-Eloquenturl automatically adds search and filtering for your Eloquent model using [query string](https://en.wikipedia.org/wiki/Query_string).
+Eloquenturl automatically adds search and filtering for your Eloquent models using [query strings](https://en.wikipedia.org/wiki/Query_string).
 
-Eloquenturl respects your the `$fillable` and `$hidden` attributes of your Eloquent model to make intuitive defaults, providing zero-configuration usage. For example:
+Eloquenturl respects the `$fillable` and `$hidden` attributes of your Eloquent models to make sensible defaults, providing zero-configuration usage. For example:
 
 ```php
-return \Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(\App\Models\User::class, $request)
+return \Doncadavona\Eloquenturl\Eloquenturl::eloquenturled(\App\Models\User::class, $request);
 ```
 
-By just passing the model and the request, the model is made searchable and filterable without you having to manage which attributes are queryable and without writing the complex database queries.
+By just passing the model and the request, the model is made searchable and filterable without you having to manage which attributes are queryable and without writing complex logic and database queries.
 
-_Eloquenturl is fast_ because it builds and executes a single database query.
+_Eloquenturl is fast_ because it is built and executed as a single database query.
 
 ## Table of Contents
 
