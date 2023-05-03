@@ -326,7 +326,14 @@ class Eloquenturl implements EloquenturlInterface
      */
     private static function buildColumnMax(): void
     {
-        self::buildColumnLessThanOrEqual();
+        // Build column less than or equal (lte) identifer
+        if (self::$request->filled('max')) {
+            foreach (self::$request->max as $key => $value) {
+                if ($value) {
+                    self::$query = self::$query->where($key, '<=', $value);
+                }
+            }
+        }
     }
 
     /**
