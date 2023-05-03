@@ -10,7 +10,7 @@
         }
     ],
     "homepage": "https://github.com/doncadavona/eloquenturl",
-    "keywords": ["Laravel", "Eloquenturl", "search", "filter"],
+    "keywords": ["Laravel", "Eloquenturl", "search", "filter", "query string", "query parameters"],
     "require": {
         "illuminate/support": "~7|~8"
     },
