@@ -1,6 +1,6 @@
 {
     "name": "doncadavona/eloquenturl",
-    "description": "Query Eloquent models with URL query parameters.",
+    "description": "Search and filter Laravel Eloquent models by query parameters with ease.",
     "license": "MIT",
     "authors": [
         {
@@ -10,7 +10,7 @@
         }
     ],
     "homepage": "https://github.com/doncadavona/eloquenturl",
-    "keywords": ["Laravel", "Eloquenturl"],
+    "keywords": ["Laravel", "Eloquenturl", "search", "filter"],
     "require": {
         "illuminate/support": "~7|~8"
     },
