@@ -43,4 +43,49 @@ interface EloquenturlInterface
      * @return Illuminate\Pagination\LengthAwarePaginator
      */
     public static function eloquenturledWithoutPagination($class, Request $request);
+
+    /**
+     * Build the database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::queryByParameters(User::class)->get();
+     * $users = Eloquenturl::queryByParameters(User::class)->paginate();
+     * 
+     * @param mixed $class
+     * @return Illuminate\Database\Eloquent\Builder
+     */
+    public static function queryByParameters($class);
+
+    /**
+     * Build and execute the database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::getByParameters(User::class);
+     * 
+     * @param mixed $class
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public static function getByParameters($class);
+
+    /**
+     * Build and execute the paginated database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::paginateByParameters(User::class);
+     * 
+     * @param mixed $class
+     * @return Illuminate\Pagination\LengthAwarePaginator
+     */
+    public static function paginateByParameters($class);
+
+    /**
+     * Build and execute the simple-paginated database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::simplePaginateByParameters(User::class);
+     * 
+     * @param mixed $class
+     * @return Illuminate\Pagination\Paginator
+     */
+    public static function simplePaginateByParameters($class);
 }
