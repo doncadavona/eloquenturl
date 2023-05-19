@@ -164,6 +164,70 @@ class Eloquenturl implements EloquenturlInterface
     }
 
     /**
+     * Build the database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::queryByParameters(User::class)->get();
+     * $users = Eloquenturl::queryByParameters(User::class)->paginate();
+     * 
+     * @param mixed $class
+     * @return Illuminate\Database\Eloquent\Builder
+     */
+    public static function queryByParameters($class)
+    {
+        return self::eloquenturl($class, request());
+    }
+
+    /**
+     * Build and execute the database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::getByParameters(User::class);
+     * 
+     * @param mixed $class
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public static function getByParameters($class)
+    {
+        return self::eloquenturl($class, request())->get();
+    }
+
+    /**
+     * Build and execute the paginated database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::paginateByParameters(User::class);
+     * 
+     * @param mixed $class
+     * @return Illuminate\Pagination\LengthAwarePaginator
+     */
+    public static function paginateByParameters($class)
+    {
+        return self::eloquenturled($class, isset($parameters) ? $parameters : request());
+    }
+
+    /**
+     * Build and execute the simple-paginated database query based on query parameters.
+     * 
+     * For example:
+     * $users = Eloquenturl::simplePaginateByParameters(User::class);
+     * 
+     * @param mixed $class
+     * @return Illuminate\Pagination\Paginator
+     */
+    public static function simplePaginateByParameters($class)
+    {
+        self::boot($class, request());
+
+        return self::buildQuery(request())
+            ->paginate(
+                self::$request->per_page
+                ? (int) self::$request->per_page
+                : null
+            );
+    }
+
+    /**
      * Build the database query for the URL query parameters.
      * 
      * @return Illuminate\Database\Eloquent\Builder

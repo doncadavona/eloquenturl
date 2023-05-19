@@ -7,6 +7,14 @@ All notable changes to `Eloquenturl` will be documented in this file.
 ### Added
 - Everything
 
+## Version v0.4.36
+
+### Added
+  - Added `Doncadavona\Eloquenturl\Eloquenturl::queryByParameters($class)`
+  - Added `Doncadavona\Eloquenturl\Eloquenturl::getByParameters($class)`
+  - Added `Doncadavona\Eloquenturl\Eloquenturl::paginateByParameters($class)`
+  - Added `Doncadavona\Eloquenturl\Eloquenturl::simplePaginateByParameters($class)`
+
 ## Version v0.4.32
 
 ### Added
