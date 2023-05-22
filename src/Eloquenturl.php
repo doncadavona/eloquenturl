@@ -220,7 +220,7 @@ class Eloquenturl implements EloquenturlInterface
         self::boot($class, request());
 
         return self::buildQuery(request())
-            ->paginate(
+            ->simplePaginate(
                 self::$request->per_page
                 ? (int) self::$request->per_page
                 : null
