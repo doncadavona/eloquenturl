@@ -53,20 +53,11 @@ class Eloquenturl implements EloquenturlInterface
 
     /**
      * The queryable columns from the Eloquent model.
-     * 
-     * WIP: Use this over $search_column, $order_by_columns and $column_matches.
-     */
-    private static $queryable_columns = [];
-
-    /**
-     * The database columns to search.
-     * Eg. /users?search=apple&search_by=first_name
+     * Eg. id, created_at, updated_at.
      * 
      * @var array
      */
-    private static $search_columns = [
-        'id',
-    ];
+    private static $queryable_columns = [];
 
     /**
      * The database columns to order by.
@@ -117,20 +108,14 @@ class Eloquenturl implements EloquenturlInterface
         self::$model = new $class;
 
         // Set the queryable columns as the difference of the model's attributes and $hidden attributes.
-        self::$queryable_columns = array_diff(
+        self::$queryable_columns = array_values(array_diff(
             Schema::getColumnListing(self::$model->getTable()),
             self::$model->getHidden()
-        );
+        ));
 
         // Set the exact-match columns as the unknown parameters.
         self::$column_matches = $request->only(
             array_diff($request->keys(), self::$parameters)
-        );
-
-        // Set the search columns as the difference of the $fillable and $hidden attribute of the model.
-        self::$search_columns = array_merge(
-            self::$search_columns,
-            array_diff(self::$model->getFillable(), self::$model->getHidden())
         );
 
         // Set the order_by_columns as the the $fillable attribute of the model.
@@ -259,7 +244,7 @@ class Eloquenturl implements EloquenturlInterface
     private static function buildQuery()
     {
         // Throw errors
-        if (!count(self::$search_columns)) {
+        if (!count(self::$queryable_columns)) {
             throw new \Exception('Eloquenturl requires at least one search column. 0 given.');
         }
 
@@ -443,7 +428,7 @@ class Eloquenturl implements EloquenturlInterface
             } else {
                 // Search by columns.
                 self::$query = self::$query->where(
-                    self::$search_columns[0],
+                    self::$queryable_columns[0],
                     'like',
                     '%' . self::$request->search . '%'
                 );
@@ -451,13 +436,13 @@ class Eloquenturl implements EloquenturlInterface
                 $i = 1;
                 do {
                     self::$query = self::$query->orWhere(
-                        self::$search_columns[$i],
+                        self::$queryable_columns[$i],
                         'like',
                         '%' . self::$request->search . '%'
                     );
 
                     $i++;
-                } while ($i < count(self::$search_columns));
+                } while ($i < count(self::$queryable_columns));
             }
         }
     }
