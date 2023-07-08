@@ -86,17 +86,6 @@ class Eloquenturl implements EloquenturlInterface
     private static $scopes = [];
 
     /**
-     * Set true to ignore invalid parameters
-     * and continue building the query.
-     * 
-     * Set to false to throw an error when an invalid
-     * parameter is encountered.
-     * 
-     * WIP: Set this in the config file.
-     */
-    private static $IGNORE_INVALID_PARAMETERS = true;
-
-    /**
      * The initial function to execute.
      * 
      * @param  mixed  $class   The Eloquent model class
@@ -479,7 +468,7 @@ class Eloquenturl implements EloquenturlInterface
             if (self::$request->filled('scopes.' . $key)) {
                 if (method_exists(self::$model, 'scope'.ucwords($key))) {
                     self::$query = self::$query->$key($value);
-                } else if (!self::$IGNORE_INVALID_PARAMETERS) {
+                } else if (!config('eloquenturl.ignore_invalid_parameters')) {
                     throw new Exception('The scope "'.$key.'" does not exist in '.self::$model::class.'.');
                 }
             }
@@ -491,10 +480,10 @@ class Eloquenturl implements EloquenturlInterface
      */
     private static function isParameterValid(string $parameter): bool
     {
-        if (!in_array($parameter, self::$queryable_columns) && self::$IGNORE_INVALID_PARAMETERS) {
+        if (!in_array($parameter, self::$queryable_columns) && config('eloquenturl.ignore_invalid_parameters')) {
             return false;
         }
-        if (!in_array($parameter, self::$queryable_columns) && !self::$IGNORE_INVALID_PARAMETERS) {
+        if (!in_array($parameter, self::$queryable_columns) && !config('eloquenturl.ignore_invalid_parameters')) {
             throw new Exception('Dubious parameter "'.$parameter.'" received.');
         }
 
