@@ -3,7 +3,9 @@
 namespace Doncadavona\Eloquenturl;
 
 use Doncadavona\Eloquenturl\EloquenturlInterface;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class Eloquenturl implements EloquenturlInterface
 {
@@ -50,6 +52,13 @@ class Eloquenturl implements EloquenturlInterface
     ];
 
     /**
+     * The queryable columns from the Eloquent model.
+     * 
+     * WIP: Use this over $search_column, $order_by_columns and $column_matches.
+     */
+    private static $queryable_columns = [];
+
+    /**
      * The database columns to search.
      * Eg. /users?search=apple&search_by=first_name
      * 
@@ -86,6 +95,15 @@ class Eloquenturl implements EloquenturlInterface
     private static $scopes = [];
 
     /**
+     * Set true to ignore invalid parameters
+     * and continue building the query.
+     * 
+     * Set to false to throw an error when an invalid
+     * parameter is encountered.
+     */
+    private static $IGNORE_INVALID_PARAMETERS = true;
+
+    /**
      * The initial function to execute.
      * 
      * @param  mixed  $class   The Eloquent model class
@@ -97,6 +115,12 @@ class Eloquenturl implements EloquenturlInterface
         self::$request = $request;
 
         self::$model = new $class;
+
+        // Set the queryable columns as the difference of the model's attributes and $hidden attributes.
+        self::$queryable_columns = array_diff(
+            Schema::getColumnListing(self::$model->getTable()),
+            self::$model->getHidden()
+        );
 
         // Set the exact-match columns as the unknown parameters.
         self::$column_matches = $request->only(
@@ -286,6 +310,9 @@ class Eloquenturl implements EloquenturlInterface
 
         foreach (self::$column_matches as $key => $value) {
             if (self::$request->filled($key)) {
+                if (!self::isParameterValid($key)) {
+                    continue;
+                }
                 if (is_numeric($key)) {
                     self::$query = self::$query->where($key, (int) $value);
                     return;
@@ -466,5 +493,20 @@ class Eloquenturl implements EloquenturlInterface
                 self::$query = self::$query->$key($value);
             }
         }
+    }
+
+    /**
+     * Check if the 
+     */
+    private static function isParameterValid(string $parameter): bool
+    {
+        if (!in_array($parameter, self::$queryable_columns) && self::$IGNORE_INVALID_PARAMETERS) {
+            return false;
+        }
+        if (!in_array($parameter, self::$queryable_columns) && !self::$IGNORE_INVALID_PARAMETERS) {
+            throw new Exception('Dubious parameter '.$parameter.' received.');
+        }
+
+        return true;
     }
 }
