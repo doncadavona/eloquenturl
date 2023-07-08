@@ -91,6 +91,8 @@ class Eloquenturl implements EloquenturlInterface
      * 
      * Set to false to throw an error when an invalid
      * parameter is encountered.
+     * 
+     * WIP: Set this in the config file.
      */
     private static $IGNORE_INVALID_PARAMETERS = true;
 
@@ -475,7 +477,11 @@ class Eloquenturl implements EloquenturlInterface
 
         foreach (self::$scopes as $key => $value) {
             if (self::$request->filled('scopes.' . $key)) {
-                self::$query = self::$query->$key($value);
+                if (method_exists(self::$model, 'scope'.ucwords($key))) {
+                    self::$query = self::$query->$key($value);
+                } else if (!self::$IGNORE_INVALID_PARAMETERS) {
+                    throw new Exception('The scope "'.$key.'" does not exist in '.self::$model::class.'.');
+                }
             }
         }
     }
@@ -489,7 +495,7 @@ class Eloquenturl implements EloquenturlInterface
             return false;
         }
         if (!in_array($parameter, self::$queryable_columns) && !self::$IGNORE_INVALID_PARAMETERS) {
-            throw new Exception('Dubious parameter '.$parameter.' received.');
+            throw new Exception('Dubious parameter "'.$parameter.'" received.');
         }
 
         return true;
