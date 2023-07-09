@@ -3,7 +3,9 @@
 namespace Doncadavona\Eloquenturl;
 
 use Doncadavona\Eloquenturl\EloquenturlInterface;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class Eloquenturl implements EloquenturlInterface
 {
@@ -50,14 +52,12 @@ class Eloquenturl implements EloquenturlInterface
     ];
 
     /**
-     * The database columns to search.
-     * Eg. /users?search=apple&search_by=first_name
+     * The queryable columns from the Eloquent model.
+     * Eg. id, created_at, updated_at.
      * 
      * @var array
      */
-    private static $search_columns = [
-        'id',
-    ];
+    private static $queryable_columns = [];
 
     /**
      * The database columns to order by.
@@ -98,15 +98,15 @@ class Eloquenturl implements EloquenturlInterface
 
         self::$model = new $class;
 
+        // Set the queryable columns as the difference of the model's attributes and $hidden attributes.
+        self::$queryable_columns = array_values(array_diff(
+            Schema::getColumnListing(self::$model->getTable()),
+            self::$model->getHidden()
+        ));
+
         // Set the exact-match columns as the unknown parameters.
         self::$column_matches = $request->only(
             array_diff($request->keys(), self::$parameters)
-        );
-
-        // Set the search columns as the difference of the $fillable and $hidden attribute of the model.
-        self::$search_columns = array_merge(
-            self::$search_columns,
-            array_diff(self::$model->getFillable(), self::$model->getHidden())
         );
 
         // Set the order_by_columns as the the $fillable attribute of the model.
@@ -235,7 +235,7 @@ class Eloquenturl implements EloquenturlInterface
     private static function buildQuery()
     {
         // Throw errors
-        if (!count(self::$search_columns)) {
+        if (!count(self::$queryable_columns)) {
             throw new \Exception('Eloquenturl requires at least one search column. 0 given.');
         }
 
@@ -286,6 +286,9 @@ class Eloquenturl implements EloquenturlInterface
 
         foreach (self::$column_matches as $key => $value) {
             if (self::$request->filled($key)) {
+                if (!self::isParameterValid($key)) {
+                    continue;
+                }
                 if (is_numeric($key)) {
                     self::$query = self::$query->where($key, (int) $value);
                     return;
@@ -416,7 +419,7 @@ class Eloquenturl implements EloquenturlInterface
             } else {
                 // Search by columns.
                 self::$query = self::$query->where(
-                    self::$search_columns[0],
+                    self::$queryable_columns[0],
                     'like',
                     '%' . self::$request->search . '%'
                 );
@@ -424,13 +427,13 @@ class Eloquenturl implements EloquenturlInterface
                 $i = 1;
                 do {
                     self::$query = self::$query->orWhere(
-                        self::$search_columns[$i],
+                        self::$queryable_columns[$i],
                         'like',
                         '%' . self::$request->search . '%'
                     );
 
                     $i++;
-                } while ($i < count(self::$search_columns));
+                } while ($i < count(self::$queryable_columns));
             }
         }
     }
@@ -463,8 +466,27 @@ class Eloquenturl implements EloquenturlInterface
 
         foreach (self::$scopes as $key => $value) {
             if (self::$request->filled('scopes.' . $key)) {
-                self::$query = self::$query->$key($value);
+                if (method_exists(self::$model, 'scope'.ucwords($key))) {
+                    self::$query = self::$query->$key($value);
+                } else if (!config('eloquenturl.ignore_invalid_parameters')) {
+                    throw new Exception('The scope "'.$key.'" does not exist in '.self::$model::class.'.');
+                }
             }
         }
+    }
+
+    /**
+     * Check if the 
+     */
+    private static function isParameterValid(string $parameter): bool
+    {
+        if (!in_array($parameter, self::$queryable_columns) && config('eloquenturl.ignore_invalid_parameters')) {
+            return false;
+        }
+        if (!in_array($parameter, self::$queryable_columns) && !config('eloquenturl.ignore_invalid_parameters')) {
+            throw new Exception('Dubious parameter "'.$parameter.'" received.');
+        }
+
+        return true;
     }
 }
