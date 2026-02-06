@@ -289,9 +289,12 @@ class Eloquenturl implements EloquenturlInterface
                 if (!self::isParameterValid($key)) {
                     continue;
                 }
-                if (is_numeric($key)) {
+                if (is_numeric($value)) {
                     self::$query = self::$query->where($key, (int) $value);
-                    return;
+                } else if (strtolower($value) == 'true') {
+                    self::$query = self::$query->where($key, true);
+                } else if (strtolower($value) == 'false') {
+                    self::$query = self::$query->where($key, false)->orWhereNull($key);
                 } else {
                     self::$query = self::$query->where($key, $value);
                 }
@@ -476,7 +479,8 @@ class Eloquenturl implements EloquenturlInterface
     }
 
     /**
-     * Check if the 
+     * TODO:
+     * Check if the given parameter is valid.
      */
     private static function isParameterValid(string $parameter): bool
     {
